@@ -2645,9 +2645,6 @@ var T_FAN = leblEx('slopefields_section', 'Section 1.2, Slope Fields', 'Example 
 var T_EQ = paulEx('EquilibriumSolutions', 'Equilibrium Solutions', 'Example 2');
 var T_AUT = leblEx('auteq_section', 'Section 1.6, Autonomous Equations');
 var T_HARV = leblEx('auteq_section', 'Section 1.6, Autonomous Equations', 'the logistic equation with harvesting');
-var T_BERN = paulEx('Bernoulli', 'Bernoulli Differential Equations', 'Example 1');
-var T_BERNL = leblEx('substitution_section', 'Section 1.5, Substitution', 'Bernoulli equations');
-var T_LIN = paulEx('Linear', 'Linear Differential Equations', 'the Solution Process');
 
 /* ---------------- form guards (see the problem object above) ---------------- */
 var FORM = {
@@ -2681,6 +2678,7 @@ var O_ONE = 'Exactly one solution, on some interval around `t_0`', O_SOME = 'At 
   O_MANY = 'More than one solution', O_NONE = 'No information, because `f` is not continuous there';
 var P1_T = 'Type only the derivative of `(y − 2)^(1/3)` in `y`. The constant factor `F{1}{t^2 − 9}` is set aside, so this box takes no `t`.';
 var NO_T = 'This `f` has no `t` in it. Type your answer as a function of `y` alone.';
+var NO_T_H = 'This `f` has no `t` in it. Type your answer as a function of `h` alone.';
 var P5_CLOSE2 = 'Close. Keep two decimal places, with `e^(−2) ≈ 0.1353` and `e^2 ≈ 7.389`, and round only at the end.';
 
 /* the solution of y′ = f(y) through (0, y0), by RK4 with step 0.002, sampled on [a, b]; NaN once |y| passes 50 (for figures) */
@@ -2709,7 +2707,7 @@ var SECTIONS_P = [
   { id: 'sec-phase', title: 'Phase Lines and Stability', lede: 'These go with BDH Section 1.6, pages 74 to 86. BDH calls a stable equilibrium a sink, an unstable one a source, and a semistable one a node. Lebl’s [Section 1.6](' + T_AUT[0] + ') is a second explanation, and it writes `x(t)` where we write `y(t)`.' },
   { id: 'sec-long', title: 'Long-Run Behavior', lede: 'This goes with BDH Section 1.6, pages 78 to 80.' },
   { id: 'sec-harvest', title: 'Harvesting and the Critical Rate', lede: 'This goes with BDH Section 1.7, pages 101 to 105. BDH calls the harvest `C`. This course writes `H`, because `C` is our constant of integration.' },
-  { id: 'sec-bern', title: 'Bernoulli Equations', lede: 'This goes with BDH Appendix A, pages 735 and 736. Paul’s [Bernoulli Differential Equations](' + T_BERN[0] + ') page uses our letters `p` and `q`, with `x` as the variable.' }
+  { id: 'sec-past', title: 'The Bottle, Run Backward', lede: 'This goes with the note Many Pasts in the Unit 4 Reading Guide, Part 1, and with BDH Section 1.5, page 66. Lebl’s [Example 1.2.2](' + T_FAN[0] + ') shows the same failure of uniqueness, with solutions leaving 0 instead of reaching it.' }
 ];
 
 /* ---------------- the problems ---------------- */
@@ -2982,46 +2980,62 @@ var PROBLEMS = [
       aria: 'The growth hump 0.3 P (1 − P over 40) for P from 0 to 40, peaking at height 3 at P = 20. A dashed line at height 2.25 meets the hump at P = 10 and P = 30. A solid line at height 3 touches its top. A dashed line at height 4 misses it.' },
     after: 'The equilibria are where the hump meets the harvest line. The line `H = 2.25` meets it twice, at `P = 10` and `P = 30`. The line `H = 3` touches its top, and the line `H = 4` misses it.' },
 
-  /* 8. a Bernoulli equation, checked against the phase line */
-  { id: 'p8', sec: 'sec-bern', task: 'Solve the initial-value problem with a Bernoulli substitution, then check the answer against the phase line.',
-    board: ['D{y}{t} = 3y − 6y^2', 'y(0) = F{1}{4}'], v: 't', teach: T_BERN,
+  /* 8. the draining bottle run backward: an empty bottle has one future and many pasts */
+  { id: 'pb', sec: 'sec-past', task: 'Water drains from a bottle through a small hole. Its height `h` above the hole, in cm, follows Torricelli’s law, with `t` in seconds and `h ≥ 0`. Run the model forward, then ask what an empty bottle can tell you about its past.',
+    board: ['D{h}{t} = −0.4 sqrt(h), h ≥ 0', 'h(0) = 25'], v: 't', teach: T_FAN,
     steps: [
-      { lead: 'Which substitution turns this into a linear equation?', ok: 0, pick: [
-        ['`v = y^(−1)`', 'The power on the right is `n = 2`, so `v = y^(1 − n) = y^(−1)`. Dividing by `y^2` loses the equilibrium `y = 0`, which does not meet `y(0) = F{1}{4}`.'],
-        ['`v = y^2`', 'The substitution is `v = y^(1 − n)`, not `y^n`.'],
-        ['`v = y^(−2)`', 'For `n = 2`, `1 − n = −1`, so `v = y^(−1)`.']] },
-      { show: 'y′ − 3y = −6y^2' },
-      { lead: 'In the form `y′ + p y = q y^n`, read `p` and `q`. The linear equation is `v′ + (1 − n)p v = (1 − n)q`.', ask: '(1 − n)p =', num: true, ans: '3',
-        wrongs: [['-3', 'Two signs meet here: `p = −3`, the coefficient of `y` on the left, and `1 − n = −1`. Their product is 3.']],
-        hints: ['Here `p = −3` and `1 − n = −1`. Multiply them.'], teach: T_BERNL },
-      { ask: '(1 − n)q =', num: true, ans: '6',
-        wrongs: [['-6', 'The factor `1 − n = −1` multiplies `q = −6` as well, so `(1 − n)q = 6`. Leaving it off one side is the most common Bernoulli mistake.']],
-        hints: ['Here `q = −6`, the coefficient of `y^2`, and `1 − n = −1`.'], teach: T_BERNL },
-      { show: 'v′ + 3v = 6' },
-      { lead: 'Convert the starting value.', ask: 'v(0) = y(0)^(1 − n) =', num: true, ans: '4',
-        wrongs: [[['1/4', '0.25'], '`v` starts where `y^(−1)` starts: `v(0) = (F{1}{4})^(−1) = 4`, not `y(0)`.'],
-          [['1/16', '0.0625'], 'Use the power `1 − n = −1`, not `n = 2`.'],
-          ['16', 'Use the power `1 − n = −1`, so `v(0) = F{1}{y(0)}`.']],
-        hints: ['`v = y^(−1) = F{1}{y}`. Put in `y(0) = F{1}{4}`.'] },
-      { lead: 'Solve `v′ + 3v = 6` as in Unit 3. Its constant solution is `v = 2`, so `v = 2 + Ce^(−3t)`. Use `v(0) = 4`.', ask: 'C =', num: true, ans: '2',
-        wrongs: [['4', '`C` is not `v(0)`. At `t = 0`, `v = 2 + C`.'], [['-7/4', '-1.75'], 'That uses `y(0) = F{1}{4}`. Use `v(0) = 4`, so `2 + C = 4`.']],
-        hints: ['At `t = 0`, `e^0 = 1`, so `v(0) = 2 + C`.'], teach: T_LIN },
-      { lead: 'Return to `y`.', ask: 'y =', ans: '1/(2 + 2e^(-3t))',
-        wrongs: [['2 + 2e^(-3t)', 'That is `v`. Since `v = y^(−1)`, `y = F{1}{v}`.'], ['1/(2 + 4e^(-3t))', 'Use `C = 2`, not `v(0) = 4`, as the coefficient of `e^(−3t)`.']],
-        hints: ['`v = y^(−1)`, so `y = F{1}{v}`.'], sol: ['`y = F{1}{v} = F{1}{2 + 2e^(−3t)}`'] },
-      { lead: 'As `t → ∞`, `y → F{1}{2}`. Does the phase line of `3y − 6y^2` agree?', ok: 0, pick: [
-        ['Yes: `3y − 6y^2 = 3y(1 − 2y)` has a stable equilibrium at `F{1}{2}`, and `F{1}{4}` lies below it with an up arrow', 'A phase-line forecast and a formula now agree.'],
-        ['No: the phase line says the solution goes to 0', '0 is unstable here. Just above 0, `f > 0`, so the arrow points up, away from 0.'],
-        ['No: the phase line says the solution grows without bound', 'The solution starts between the equilibria 0 and `F{1}{2}`, and it cannot cross `F{1}{2}`.']] },
-      { lead: 'On which interval is the solution valid?', ok: 0, pick: [
-        ['Every `t`', '`v = 2 + 2e^(−3t)` is a sum of two positive terms, so it is never 0, and `y = F{1}{v}` has a value for every `t`.'],
-        ['`t > 0`', 'Nothing breaks at `t = 0`. The solution is valid on the largest interval through `t_0 = 0` where `v ≠ 0`.'],
-        ['`t > −F{ln 2}{3}`', 'That would be the break if `v` were `2 − e^(−3t)`. Here `v = 2 + 2e^(−3t)`, which is never 0.']] }],
-    graph: { x: [-1.5, 2.5], y: [0, 0.7], ticks: { x: 0.5, y: 0.1 },
-      fns: [{ f: function (t) { return 1 / (2 + 2 * Math.exp(-3 * t)); } }],
-      hlines: [{ y: 0.5, role: 'muted' }], dots: [{ x: 0, y: 0.25, label: '(0, 1/4)', at: 'se' }],
-      aria: 'The graph of y = 1 over (2 + 2 e to the minus 3t) for t from −1.5 to 2.5. It rises from near 0 on the left, through (0, 1/4), toward a dashed line at y = 1/2.' },
-    after: 'The solution rises from near 0 in the past toward `F{1}{2}` in the long run, as the phase line predicts.' }
+      { lead: 'Separating gives `2 sqrt(h) = −0.4t + 10`, so `sqrt(h) = 5 − 0.2t` while the bottle still holds water. At what time is it empty?', ask: 't =', num: true, ans: '25', tol: 0.01,
+        wrongs: [['12.5', 'That divides 5 by 0.4. The 0.4 was halved when you divided by 2: `sqrt(h) = 5 − 0.2t` is 0 when `0.2t = 5`.'],
+          ['125', 'That divides `h(0) = 25` by 0.2. It is `sqrt(h)` that falls in a straight line, from `sqrt(25) = 5`.'],
+          ['62.5', 'That divides 25 by 0.4, as if `h` fell in a straight line. It is `sqrt(h)` that does, from 5 at the rate 0.2.']],
+        hints: ['The bottle is empty when `sqrt(h) = 5 − 0.2t` reaches 0.'],
+        sol: ['`5 − 0.2t = 0` gives `t = 25`'] },
+      { show: ['h = F{(25 − t)^2}{25}, 0 ≤ t ≤ 25', 'h = 0, t ≥ 25'] },
+      { lead: 'Now forget `h(0)`. Suppose all you know is that the bottle is empty at `t = 30`, so `h(30) = 0`. To test the uniqueness hypothesis there, find `F{∂f}{∂h}` for `f(h) = −0.4 sqrt(h)`.', ask: 'F{∂f}{∂h} =', ans: '-1/(5sqrt(h))', v: 'h',
+        stray: [['t', NO_T_H]],
+        wrongs: [['-0.4/sqrt(h)', 'The derivative of `sqrt(h)` is `F{1}{2 sqrt(h)}`, so the 0.4 is halved: `−0.4 · F{1}{2 sqrt(h)}`.'],
+          ['0.2/sqrt(h)', 'Keep the minus sign from `−0.4`.'],
+          [['-0.2sqrt(h)', '-0.2h^(1/2)'], 'Subtract 1 from the power: `h^(1/2)` becomes `F{1}{2}h^(−1/2)`, a negative power.'],
+          [['-1/5sqrt(h)', '-1/5*sqrt(h)'], 'Put the whole bottom in parentheses, as in ⟦-1/(5sqrt(h))⟧. Without them, ⟦/⟧ divides only by the 5.'],
+          ['-0.2h^-1/2', 'Put the whole exponent in parentheses, as in ⟦h^(-1/2)⟧. Without them, ⟦^⟧ raises only to the power −1.'],
+          [['-(4/15)h^(3/2)', '-0.2667h^(3/2)'], 'That is an antiderivative. To differentiate, bring the power `F{1}{2}` down and subtract 1 from it.']],
+        hints: ['Write `sqrt(h) = h^(1/2)` and use the power rule.'],
+        sol: ['`F{∂f}{∂h} = −0.4 · F{1}{2} h^(−1/2) = −F{0.2}{sqrt(h)}`'],
+        why: 'It has no value at `h = 0`, so `F{∂f}{∂h}` is not continuous on the line `h = 0`, where an empty bottle sits.' },
+      { lead: 'What does the theorem say about the point `(30, 0)`?', ok: 0, pick: [
+        ['It is silent: `F{∂f}{∂h}` has no value at `h = 0`', 'The uniqueness half needs `F{∂f}{∂h}` to be continuous near the point. With that hypothesis failing, the theorem neither promises one solution nor says there are more.'],
+        ['Exactly one solution passes through `(30, 0)`', '`(30, 0)` lies on the line `h = 0`, where `F{∂f}{∂h} = −F{0.2}{sqrt(h)}` has no value, so the theorem promises nothing there.'],
+        ['More than one solution passes through `(30, 0)`, because a hypothesis fails', 'A failed hypothesis only makes the theorem silent. To show more than one solution, you have to exhibit them, as the next steps do.'],
+        ['No solution passes through `(30, 0)`', 'The constant `h = 0` is a solution: `h′ = 0` and `−0.4 sqrt(0) = 0`.']] },
+      { lead: 'Test one possible past: the bottle emptied at `s = 20`, so `h = F{(20 − t)^2}{25}` for `t ≤ 20`, and `h = 0` after. Find `h′` for `t < 20`.', ask: 'h′ =', ans: '(2t-40)/25',
+        stray: [['s', 'This history empties at `s = 20`. Put 20 in place of `s`.']],
+        wrongs: [['(40-2t)/25', 'Use the chain rule: the derivative of `20 − t` is `−1`, which flips the sign.'],
+          ['(t-20)/25', 'Bring the power 2 down in front: `D{t} (20 − t)^2 = 2(20 − t) · (−1)`.'],
+          ['2t-40', 'Keep the division by 25.']],
+        hints: ['Use the chain rule on `(20 − t)^2`, then divide by 25.'],
+        sol: ['`h′ = F{2(20 − t)(−1)}{25} = F{2t − 40}{25}`'],
+        why: 'The right side agrees: `−0.4 sqrt(h) = −0.4 · F{20 − t}{5} = F{2t − 40}{25}`, since `20 − t ≥ 0`. At `t = 20` the slope is 0, so the history joins the empty bottle smoothly.' },
+      { lead: 'The same check works for every emptying time `s`: `h = F{(s − t)^2}{25}` for `t ≤ s`, then `h = 0`. Which of these histories have `h(30) = 0`?', ok: 0, pick: [
+        ['Every one with `s ≤ 30`', 'A bottle that emptied at any time up to 30 is still empty at 30, and each history solves the equation. So infinitely many solutions pass through `(30, 0)`.'],
+        ['Only `s = 25`, the time found from `h(0) = 25`', 'That uses `h(0) = 25`, which you no longer know. From `h(30) = 0` alone, `s = 10`, 20 or 30 fit just as well.'],
+        ['Only `s = 30`', 'A bottle that emptied earlier stays empty, so it also reads 0 at `t = 30`.'],
+        ['Every one with `s ≥ 30`', 'A bottle that empties after `t = 30` still holds water at 30. For `s = 35`, `h(30) = 1`.']] },
+      { lead: 'Could the bottle fill up again after `t = 30`, along `h = F{(t − 30)^2}{25}`?', ok: 0, pick: [
+        ['No: that has `h′ > 0` after 30, but the law gives `h′ = −0.4 sqrt(h) ≤ 0`', 'At `t = 35` that function has `h = 1` and `h′ = 0.4`, while the law says `h′ = −0.4`. Since `h′ ≤ 0` and `h ≥ 0`, an empty bottle stays empty.'],
+        ['Yes: it is 0 at `t = 30` and leaves with slope 0, like the histories', 'Meeting the empty bottle at one point is not enough. It must solve the equation after 30, and at `t = 35` it has `h′ = 0.4`, while the law gives `−0.4 sqrt(1) = −0.4`.'],
+        ['Yes: its square root is a straight line, as for every solution', 'Its square root `F{t − 30}{5}` rises, with slope `+0.2`. A solution’s square root falls, with slope `−0.2`.']] },
+      { lead: 'So what does finding the bottle empty at `t = 30` tell you?', ok: 0, pick: [
+        ['Its future is determined, but its past is not', 'It stays empty from now on, yet every emptying time `s ≤ 30` fits. Two solutions can meet only where a hypothesis fails, here at `h = 0`.'],
+        ['Its past is determined: it emptied at `t = 25`', '`t = 25` came from `h(0) = 25`. An empty bottle alone fits every emptying time `s ≤ 30`.'],
+        ['Neither its past nor its future is determined', 'The future is determined: `h′ ≤ 0` and `h ≥ 0` keep an empty bottle at 0, as the last step showed.'],
+        ['Both are determined, because `f` is continuous', 'Continuity of `f` gives existence only. Uniqueness needs `F{∂f}{∂h}` to be continuous too, and it fails at `h = 0`.']] }],
+    graph: { x: [0, 40], y: [0, 40], ticks: { x: 5, y: 10 }, labels: { x: 't' },
+      fns: [10, 20, 25, 30].map(function (s) {
+        return { f: function (t) { return t <= s ? (s - t) * (s - t) / 25 : 0; }, n: 400, role: s === 25 ? 'rate' : 'muted' };
+      }),
+      dots: [{ x: 30, y: 0, label: '(30, 0)', at: 'n' }],
+      aria: 'Four draining histories for t from 0 to 40. Each is a parabola falling to 0 at its emptying time, 10, 20, 25 or 30, and then flat at 0. The one that empties at 25 starts at height 25 and is colored. All four are at 0 at the point (30, 0).' },
+    after: 'Each curve empties at a different time, 10, 20, 25 or 30, and then stays at 0, so all four pass through `(30, 0)`. The colored one is the bottle that held 25 cm at `t = 0`. Run forward, every curve ends at 0. Run backward from `(30, 0)`, the curves spread apart, so the point alone cannot pick one.' }
 ];
 
 /* ================================ builder (keep unchanged when copying) ================================ */
@@ -3223,7 +3237,7 @@ function sectionHTML(s, n) {
   var ps = PROBLEMS.filter(function (p) { return p.sec === s.id; });
   return sec(s.id, String(n + 1), s.title, s.lede) + col(ps.map(function (p) { return blk(p.id, function () { return problemHTML(p); }); }).join(''));
 }
-var NAV = { 'sec-eu': 'Theorem', 'sec-cross': 'No Crossing', 'sec-phase': 'Phase Lines', 'sec-long': 'Long Run', 'sec-harvest': 'Harvest', 'sec-bern': 'Bernoulli' };
+var NAV = { 'sec-eu': 'Theorem', 'sec-cross': 'No Crossing', 'sec-phase': 'Phase Lines', 'sec-long': 'Long Run', 'sec-harvest': 'Harvest', 'sec-past': 'Bottle' };
 function backHTML() {
   return sec('sec-back', '', 'Back to the Unit', '') + prose('', [
     'If one kind of problem gave you trouble, redo its example on the Unit 4 Worked Examples page, then try the practice problem under that example.',
@@ -3246,8 +3260,9 @@ mount(page());
 var GUARD_CASES = [['p2-4', '5(t^5)^(4/5)', true], ['p2-4', '5t^(20/5)', true], ['p2-4', '5t^4', false], ['p2-4', '5*t^4', false], ['p2-4', '5 t^4', false]];
 /* [item id, typed answer, the stray-letter message it should get, or null] */
 var STRAY_CASES = [['p1-1', '1/(3(t^2-9)(y-2)^(2/3))', P1_T], ['p2-1', '4t(y+1)^(-1/5)', NO_T], ['p5-2', '(y^2-2y-4)e^(-t)', NO_T],
-  ['p8-8', '1/(2 + Ce^(-3t))', C_MSG], ['p2-3', '5t^4 + C', C_MSG], ['p1-1', '(1/3)(y-2)^(-2/3)', null], ['p5-2', '(y^2-2y-4)e^(-y)', null],
-  ['p8-8', '1/(2+2e^(-3t))', null], ['p3-1', 'y = -2, y = 4', null], ['p2-4', '5(t^5)^(4/5)', null]];
+  ['pb-3', '-0.2t/sqrt(h)', NO_T_H], ['pb-5', '(2t-2s)/25', 'This history empties at `s = 20`. Put 20 in place of `s`.'], ['pb-5', '(2t - 40)/C', C_MSG],
+  ['p2-3', '5t^4 + C', C_MSG], ['p1-1', '(1/3)(y-2)^(-2/3)', null], ['p5-2', '(y^2-2y-4)e^(-y)', null],
+  ['pb-3', '-1/(5sqrt(h))', null], ['pb-5', '(2t-40)/25', null], ['p3-1', 'y = -2, y = 4', null], ['p2-4', '5(t^5)^(4/5)', null]];
 /* a guarded row, an answer the guard refuses, and a phrase its diagnosis contains: typed and checked in the live DOM */
 var LIVE_GUARD = { p: 'p2', id: 'p2-4', raw: '5(t^5)^(4/5)', says: 'simplify it' };
 
@@ -3341,7 +3356,7 @@ selfcheck.add('an exponent typed without its parentheses gets the exponent diagn
     alts(w[0]).forEach(function (f) { n++; var r = judge(ITEMS[id], f); if (r.st !== 'slip' || r.msg !== EXP_MSG) bad.push(id + ' "' + f + '" -> ' + r.st); });
   });
   if (!n) return { ok: false, detail: 'no row carries an exponent slip' };
-  if (judge(ITEMS['p8-8'], '1/(2 + 2e^-3t)').msg !== EXP_MSG) bad.push('p8-8 "1/(2 + 2e^-3t)" does not get the exponent diagnosis');
+  if (judge(ITEMS['p2-1'], '4(y+1)^-1/5').msg !== EXP_MSG) bad.push('p2-1 "4(y+1)^-1/5" does not get the exponent diagnosis');
   return bad.length ? { ok: false, detail: bad.join('; ') } : { ok: true, detail: n + ' slips on ' + rows + ' rows' };
 });
 
